@@ -1,16 +1,36 @@
 const mapper = require('./map')
+const moves = require('./moves')
 
-const startGame = () => {
-    mapper.resetBoard()
+class Game {
+    constructor() {
+        this.resetBoard()
+    }
+    resetBoard() {
+        this.board = [
+            [+2, +3, +4, +5, +6, +4, +3, +2],
+            [+1, +1, +1, +1, +1, +1, +1, +1],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-2, -3, -4, -5, -6, -4, -3, -2]
+        ]
+    }
+    startGame() {
+
+    }
+    displayBoard() {
+        console.table(this.board)
+    }
+    makeMove(_from, _to) {
+        const from  = mapper.getNumericPosition(_from)
+        const to = mapper.getNumericPosition(_to)
+        moves.makeMove(this.board, from, to)
+        this.displayBoard()
+    }
 }
 
-const makeMove = (from, to) => {
-    mapper.makeMove(from, to)
-}
+const game = new Game()
 
-makeMove('B1', 'A3')
-
-module.exports = {
-    startGame: startGame,
-    makeMove: makeMove
-}
+game.makeMove('A2', 'A3')

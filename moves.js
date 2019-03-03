@@ -1,26 +1,12 @@
 const _ = require('lodash')
+const utils = require('./utils')
 
 class Moves {
     constructor() {
 
     }
-    areSameColor(piece1, piece2) {
-        return (piece1 > 0 && piece2 > 0) || (piece1 < 0 && piece2 < 0)
-    }
-    getElement(board, pos) {
-        if (pos[0] < 0 || pos[0] > 7 || pos[1] < 0 || pos[1] > 7) {
-            return
-        }
-        return board[pos[0]][pos[1]]
-    }
-    getOffsetPos(pos, offset) {
-        return [
-            pos[0] - offset[1],
-            pos[1] + offset[0]
-        ]
-    }
     getKingMoves(board, pos) {
-        const king       = this.getElement(board, pos) * -1
+        const king       = utils.getElement(board, pos) * -1
         const allOffsets = [
             //top
             [0, 1],
@@ -41,9 +27,9 @@ class Moves {
         ]
         let moves = []
         allOffsets.forEach(offset => {
-            let offsetPos = this.getOffsetPos(pos, offset)
-            let ele       = this.getElement(board, offsetPos)
-            let sameColor = this.areSameColor(king, ele)
+            let offsetPos = utils.getOffsetPos(pos, offset)
+            let ele       = utils.getElement(board, offsetPos)
+            let sameColor = utils.areSameColor(king, ele)
             if (ele !== undefined && !sameColor) {
                 moves.push(offsetPos)
             }
@@ -51,7 +37,7 @@ class Moves {
         return moves
     }
     getKnightMoves(board, pos) {
-        const knight = this.getElement(board, pos)
+        const knight = utils.getElement(board, pos)
         const allOffsets = [
             [-2,  1], [-1,  2],
             [ 2,  1], [ 1,  2],
@@ -60,9 +46,9 @@ class Moves {
         ]
         let moves = []
         allOffsets.forEach(offset => {
-            let offsetPos = this.getOffsetPos(pos, offset)
-            let ele       = this.getElement(board, offsetPos)
-            let sameColor = this.areSameColor(knight, ele)
+            let offsetPos = utils.getOffsetPos(pos, offset)
+            let ele       = utils.getElement(board, offsetPos)
+            let sameColor = utils.areSameColor(knight, ele)
             if (ele !== undefined && !sameColor) {
                 moves.push(offsetPos)
             }
@@ -70,14 +56,14 @@ class Moves {
         return moves
     }
     getRookMoves(board, pos) {
-        const rook = this.getElement(board, pos)
+        const rook = utils.getElement(board, pos)
         let moves  = []
         //horizontal
         // going left
         for (let j = pos[1] - 1; j >= 0; j--) {
             const offsetPos = [pos[0], j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(rook, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -94,8 +80,8 @@ class Moves {
         // going right
         for (let j = pos[1] + 1; j <= 7; j++) {
             const offsetPos = [pos[0], j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(rook, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -114,8 +100,8 @@ class Moves {
         // going top
         for (let i = pos[0] - 1; i >= 0; i--) {
             const offsetPos = [i, pos[1]]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(rook, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -132,8 +118,8 @@ class Moves {
         // going bottom
         for (let i = pos[0] + 1; i <= 7; i++) {
             const offsetPos = [i, pos[1]]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(rook, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -150,13 +136,13 @@ class Moves {
         return moves
     }
     getBishopMoves(board, pos) {
-        const bishop = this.getElement(board, pos)
+        const bishop = utils.getElement(board, pos)
         let moves    = []
         // top-left
         for (let i = pos[0] - 1, j = pos[1] - 1; i >= 0 && j >= 0; i--, j--) {
             const offsetPos = [i, j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(bishop, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -173,8 +159,8 @@ class Moves {
         // top-right
         for (let i = pos[0] - 1, j = pos[1] + 1; i >= 0 && j <= 7; i--, j++) {
             const offsetPos = [i, j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(bishop, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -191,8 +177,8 @@ class Moves {
         // bottom-right
         for (let i = pos[0] + 1, j = pos[1] + 1; i <= 7 && j <= 7; i++, j++) {
             const offsetPos = [i, j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(bishop, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -209,8 +195,8 @@ class Moves {
         // bottom-left
         for (let i = pos[0] + 1, j = pos[1] - 1; i <= 7 && j >= 0; i++, j--) {
             const offsetPos = [i, j]
-            const ele       = this.getElement(board, offsetPos)
-            const sameColor = this.areSameColor(bishop, ele)
+            const ele       = utils.getElement(board, offsetPos)
+            const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
                     moves.push(offsetPos)
@@ -233,12 +219,12 @@ class Moves {
         return moves
     }
     getPawnMoves(board, pos) {
-        const pawn = this.getElement(board, pos)
+        const pawn = utils.getElement(board, pos)
         let moves  = []
         if (pawn > 0) {
             // bottom
-            const bottomPos = this.getOffsetPos(pos, [0, -1])
-            const bottomEle = this.getElement(board, bottomPos)
+            const bottomPos = utils.getOffsetPos(pos, [0, -1])
+            const bottomEle = utils.getElement(board, bottomPos)
             if (bottomEle !== undefined) {
                 if (bottomEle === 0) {
                     moves.push(bottomPos)
@@ -251,9 +237,9 @@ class Moves {
                 [1, -1]
             ]
             possibleOffsets.forEach(offset => {
-                const offsetPos = this.getOffsetPos(pos, offset)
-                const ele       = this.getElement(board, offsetPos)
-                const sameColor = this.areSameColor(pos, offsetPos)
+                const offsetPos = utils.getOffsetPos(pos, offset)
+                const ele       = utils.getElement(board, offsetPos)
+                const sameColor = utils.areSameColor(pos, offsetPos)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
                         moves.push(offsetPos)
@@ -264,8 +250,8 @@ class Moves {
         }
         else if (pawn < 0) {
             // top
-            const topPos = this.getOffsetPos(pos, [0, 1])
-            const topEle = this.getElement(board, topPos)
+            const topPos = utils.getOffsetPos(pos, [0, 1])
+            const topEle = utils.getElement(board, topPos)
             if (topEle !== undefined) {
                 if (topEle === 0) {
                     moves.push(topPos)
@@ -278,9 +264,9 @@ class Moves {
                 [1, 1]
             ]
             possibleOffsets.forEach(offset => {
-                const offsetPos = this.getOffsetPos(pos, offset)
-                const ele       = this.getElement(board, offsetPos)
-                const sameColor = this.areSameColor(pos, offsetPos)
+                const offsetPos = utils.getOffsetPos(pos, offset)
+                const ele       = utils.getElement(board, offsetPos)
+                const sameColor = utils.areSameColor(pos, offsetPos)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
                         moves.push(offsetPos)
@@ -291,7 +277,7 @@ class Moves {
         }
     }
     getAllPossibleMoves(board, pos) {
-        const piece = this.getElement(board, pos)
+        const piece = utils.getElement(board, pos)
         switch (piece) {
             case -6:
             case +6:
@@ -315,6 +301,24 @@ class Moves {
                 return []
         }
     }
+    check(board, color) {
+        const kingPos = utils.getPositions(board, color * 6)[0]
+        
+        const checkIfSamePosition = (pos1, pos2) => {
+            return pos1[0] === pos2[0] && pos1[1] === pos2[1]
+        }
+        
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (color !== 0 && utils.areSameColor(board[i][j], color)) {
+                    const possibleMoves = this.getAllPossibleMoves(board, [i, j])
+                    let isWithinPossibleMoves = _.find(possibleMoves, (move) => checkIfSamePosition(move, kingPos))
+                    if (isWithinPossibleMoves) return true
+                }
+            }
+        }
+        return false
+    }
     isValidMove(board, from, to) {
         const possibleMoves = this.getAllPossibleMoves(board, from)
         
@@ -324,7 +328,22 @@ class Moves {
 
         let isWithinPossibleMoves = _.find(possibleMoves, (move) => checkIfSamePosition(move, to))
 
-        return isWithinPossibleMoves
+        let _toElement = _.cloneDeep(utils.getElement(board, to))
+        this.movePiece(board, from, to)
+        let canCauseCheck = this.check(board, utils.getColorByPos(board, from))
+        this.movePiece(board, to, from)
+        utils.setElement(board, to, _toElement)
+
+        return isWithinPossibleMoves && !canCauseCheck
+    }
+    movePiece(board, from, to) {
+        utils.setElement(board, to, utils.getElement(board, from))
+        utils.setElement(board, from, 0)
+    }
+    makeMove(board, from, to) {
+        if (this.isValidMove(board, from, to)) {
+            this.movePiece(board, from, to)
+        }
     }
 }
 
