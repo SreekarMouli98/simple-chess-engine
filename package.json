@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "A Multiplayer chess engine",
   "main": "index.js",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
-  "devDependencies": {}
+  "devDependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
 }

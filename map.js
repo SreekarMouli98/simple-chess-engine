@@ -38,8 +38,8 @@ class Map {
         from = this.getNumericPosition(from)
         to   = this.getNumericPosition(to)
         if (moves.isValidMove(this.board, from , to)) {
-            // this.setElement(to, this.getElement(from))
-            this.setElement(from, '*')
+            this.setElement(to, this.getElement(from))
+            this.setElement(from, 0)
         }
         console.table(this.board)
     }
