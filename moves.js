@@ -221,7 +221,7 @@ class Moves {
     getPawnMoves(board, pos) {
         const pawn = utils.getElement(board, pos)
         let moves  = []
-        if (pawn > 0) {
+        if (pawn < 0) {
             // bottom
             const bottomPos = utils.getOffsetPos(pos, [0, -1])
             const bottomEle = utils.getElement(board, bottomPos)
@@ -239,7 +239,7 @@ class Moves {
             possibleOffsets.forEach(offset => {
                 const offsetPos = utils.getOffsetPos(pos, offset)
                 const ele       = utils.getElement(board, offsetPos)
-                const sameColor = utils.areSameColor(pos, offsetPos)
+                const sameColor = utils.areSameColor(pawn, ele)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
                         moves.push(offsetPos)
@@ -248,7 +248,7 @@ class Moves {
             })
             return moves
         }
-        else if (pawn < 0) {
+        else if (pawn > 0) {
             // top
             const topPos = utils.getOffsetPos(pos, [0, 1])
             const topEle = utils.getElement(board, topPos)
@@ -266,15 +266,15 @@ class Moves {
             possibleOffsets.forEach(offset => {
                 const offsetPos = utils.getOffsetPos(pos, offset)
                 const ele       = utils.getElement(board, offsetPos)
-                const sameColor = utils.areSameColor(pos, offsetPos)
+                const sameColor = utils.areSameColor(pawn, ele)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
                         moves.push(offsetPos)
                     }
                 }
             })
-            return moves
         }
+        return moves
     }
     getAllPossibleMoves(board, pos) {
         const piece = utils.getElement(board, pos)
@@ -301,18 +301,14 @@ class Moves {
                 return []
         }
     }
-    check(board, color) {
+    selfCheck(board, color) {
         const kingPos = utils.getPositions(board, color * 6)[0]
-        
-        const checkIfSamePosition = (pos1, pos2) => {
-            return pos1[0] === pos2[0] && pos1[1] === pos2[1]
-        }
-        
+
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (color !== 0 && utils.areSameColor(board[i][j], color)) {
+                if (color !== 0 && !utils.areSameColor(board[i][j], color)) {
                     const possibleMoves = this.getAllPossibleMoves(board, [i, j])
-                    let isWithinPossibleMoves = _.find(possibleMoves, (move) => checkIfSamePosition(move, kingPos))
+                    let isWithinPossibleMoves = _.find(possibleMoves, (move) => utils.checkIfSamePosition(move, kingPos))
                     if (isWithinPossibleMoves) return true
                 }
             }
@@ -321,27 +317,29 @@ class Moves {
     }
     isValidMove(board, from, to) {
         const possibleMoves = this.getAllPossibleMoves(board, from)
-        
-        const checkIfSamePosition = (pos1, pos2) => {
-            return pos1[0] === pos2[0] && pos1[1] === pos2[1]
+
+        let isWithinPossibleMoves = true;
+        let canCauseSelfCheck = false;
+
+        isWithinPossibleMoves = _.find(possibleMoves, (move) => utils.checkIfSamePosition(move, to))
+
+        if (isWithinPossibleMoves) {
+            let _toElement = _.cloneDeep(utils.getElement(board, to))
+            this.movePiece(board, from, to)
+            canCauseSelfCheck = this.selfCheck(board, utils.getColorByPos(board, to))
+            this.movePiece(board, to, from)
+            utils.setElement(board, to, _toElement)
         }
 
-        let isWithinPossibleMoves = _.find(possibleMoves, (move) => checkIfSamePosition(move, to))
-
-        let _toElement = _.cloneDeep(utils.getElement(board, to))
-        this.movePiece(board, from, to)
-        let canCauseCheck = this.check(board, utils.getColorByPos(board, from))
-        this.movePiece(board, to, from)
-        utils.setElement(board, to, _toElement)
-
-        return isWithinPossibleMoves && !canCauseCheck
+        return isWithinPossibleMoves && !canCauseSelfCheck
     }
     movePiece(board, from, to) {
         utils.setElement(board, to, utils.getElement(board, from))
         utils.setElement(board, from, 0)
     }
     makeMove(board, from, to) {
-        if (this.isValidMove(board, from, to)) {
+        let canMove = this.isValidMove(board, from, to)
+        if (canMove) {
             this.movePiece(board, from, to)
         }
     }
