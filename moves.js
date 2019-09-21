@@ -3,10 +3,10 @@ const utils = require('./utils')
 
 class Moves {
     constructor() {
-
+        this.currentColor = 1
     }
     getKingMoves(board, pos) {
-        const king       = utils.getElement(board, pos) * -1
+        const king       = utils.getElement(board, pos)
         const allOffsets = [
             //top
             [0, 1],
@@ -276,62 +276,72 @@ class Moves {
         }
         return moves
     }
-    getAllPossibleMoves(board, pos) {
+    getAllPossibleMoves(board, pos, options) {
         const piece = utils.getElement(board, pos)
+        let moves = []
         switch (piece) {
             case -6:
             case +6:
-                return this.getKingMoves(board, pos)
+                moves = this.getKingMoves(board, pos)
+                break;
             case -5:
             case +5:
-                return this.getQueenMoves(board, pos)
+                moves = this.getQueenMoves(board, pos)
+                break;
             case -4:
             case +4:
-                return this.getBishopMoves(board, pos)
+                moves = this.getBishopMoves(board, pos)
+                break;
             case -3:
             case +3:
-                return this.getKnightMoves(board, pos)
+                moves = this.getKnightMoves(board, pos)
+                break;
             case -2:
             case +2:
-                return this.getRookMoves(board, pos)
+                moves = this.getRookMoves(board, pos)
+                break;
             case -1:
             case +1:
-                return this.getPawnMoves(board, pos)
-            case 0:
-                return []
+                moves = this.getPawnMoves(board, pos)
+                break;
         }
+        if (_.has(options, 'removeInvalidMoves') && options.removeInvalidMoves) {
+            moves = _.filter(moves, possiblePos => {
+                let canCauseSelfCheck = this.selfCheck(board, pos, possiblePos)
+                return !canCauseSelfCheck
+            })
+        }
+        return moves
     }
-    selfCheck(board, color) {
-        const kingPos = utils.getPositions(board, color * 6)[0]
-
-        for (let i = 0; i < 8; i++) {
+    selfCheck(board, from, to) {
+        let color = utils.getColorByPos(board, from);
+        let kingPos = Math.abs(utils.getElement(board, from)) === 6 ? _.cloneDeep(to) : utils.getPositions(board, color * 6)[0]
+        let _toElement = _.cloneDeep(utils.getElement(board, to))
+        let isWithinPossibleMoves = true
+        this.movePiece(board, from, to)
+        for (let i = 0; i < 8 && isWithinPossibleMoves; i++) {
             for (let j = 0; j < 8; j++) {
                 if (color !== 0 && !utils.areSameColor(board[i][j], color)) {
                     const possibleMoves = this.getAllPossibleMoves(board, [i, j])
-                    let isWithinPossibleMoves = _.find(possibleMoves, (move) => utils.checkIfSamePosition(move, kingPos))
-                    if (isWithinPossibleMoves) return true
+                    let isWithinPossibleMoves = utils.includesPosition(possibleMoves, kingPos)
+                    if (isWithinPossibleMoves) break
                 }
             }
         }
-        return false
+        this.movePiece(board, to, from)
+        utils.setElement(board, to, _toElement)
+        return isWithinPossibleMoves
     }
     isValidMove(board, from, to) {
-        const possibleMoves = this.getAllPossibleMoves(board, from)
+        let validPiece = true
+        let isWithinPossibleMoves = true
 
-        let isWithinPossibleMoves = true;
-        let canCauseSelfCheck = false;
-
-        isWithinPossibleMoves = _.find(possibleMoves, (move) => utils.checkIfSamePosition(move, to))
-
-        if (isWithinPossibleMoves) {
-            let _toElement = _.cloneDeep(utils.getElement(board, to))
-            this.movePiece(board, from, to)
-            canCauseSelfCheck = this.selfCheck(board, utils.getColorByPos(board, to))
-            this.movePiece(board, to, from)
-            utils.setElement(board, to, _toElement)
+        validPiece = utils.areSameColor(this.currentColor, utils.getElement(board, from))
+        if (validPiece) {
+            const possibleMoves = this.getAllPossibleMoves(board, from, { removeInvalidMoves: true })
+            isWithinPossibleMoves = utils.includesPosition(possibleMoves, to)
         }
-
-        return isWithinPossibleMoves && !canCauseSelfCheck
+        return validPiece && isWithinPossibleMoves
     }
     movePiece(board, from, to) {
         utils.setElement(board, to, utils.getElement(board, from))
@@ -341,6 +351,7 @@ class Moves {
         let canMove = this.isValidMove(board, from, to)
         if (canMove) {
             this.movePiece(board, from, to)
+            this.currentColor *= -1
         }
     }
 }

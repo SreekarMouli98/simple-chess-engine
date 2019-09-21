@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const areSameColor = (piece1, piece2) => {
     return (piece1 > 0 && piece2 > 0) || (piece1 < 0 && piece2 < 0)
 }
@@ -50,6 +52,10 @@ const checkIfSamePosition = (pos1, pos2) => {
     return pos1[0] === pos2[0] && pos1[1] === pos2[1]
 }
 
+const includesPosition = (positions, pos) => {
+    return _.findIndex(positions, eachPos => checkIfSamePosition(eachPos, pos)) !== -1
+}
+
 module.exports = {
     areSameColor,
     getElement,
@@ -58,4 +64,5 @@ module.exports = {
     getColorByPos,
     getPositions,
     checkIfSamePosition,
+    includesPosition,
 }
