@@ -4,6 +4,7 @@ const utils = require('./utils')
 class Moves {
     constructor() {
         this.currentColor = 1
+        this.underCheck = 0
     }
     getKingMoves(board, pos) {
         const king       = utils.getElement(board, pos)
@@ -276,7 +277,7 @@ class Moves {
         }
         return moves
     }
-    getAllPossibleMoves(board, pos, options) {
+    getPossibleMoves(board, pos, options) {
         const piece = utils.getElement(board, pos)
         let moves = []
         switch (piece) {
@@ -306,31 +307,40 @@ class Moves {
                 break;
         }
         if (_.has(options, 'removeInvalidMoves') && options.removeInvalidMoves) {
+            /**
+             * Removes the moves which shouldn't be made when under check. These are the moves that won't remove the check.
+             * Removes the moves that shouldn't be made as they would put the current player's king under check.
+             */
             moves = _.filter(moves, possiblePos => {
-                let canCauseSelfCheck = this.selfCheck(board, pos, possiblePos)
-                return !canCauseSelfCheck
+                let isCheck = this.movePieceAndCheck(board, pos, possiblePos, utils.getColorByPos(board, pos))
+                return !isCheck
             })
         }
         return moves
     }
-    selfCheck(board, from, to) {
-        let color = utils.getColorByPos(board, from);
-        let kingPos = Math.abs(utils.getElement(board, from)) === 6 ? _.cloneDeep(to) : utils.getPositions(board, color * 6)[0]
-        let _toElement = _.cloneDeep(utils.getElement(board, to))
-        let isWithinPossibleMoves = true
-        this.movePiece(board, from, to)
-        for (let i = 0; i < 8 && isWithinPossibleMoves; i++) {
+    isCheck(board, color) {
+        let kingPos = utils.getPositions(board, color * 6)[0]
+        for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (color !== 0 && !utils.areSameColor(board[i][j], color)) {
-                    const possibleMoves = this.getAllPossibleMoves(board, [i, j])
-                    let isWithinPossibleMoves = utils.includesPosition(possibleMoves, kingPos)
-                    if (isWithinPossibleMoves) break
+                let ele = utils.getElement(board, [i, j])
+                if (ele !== undefined && !utils.areSameColor(color, ele)) {
+                    let possibleMoves = this.getPossibleMoves(board, [i, j])
+                    if (utils.includesPosition(possibleMoves, kingPos)) {
+                        return true
+                    }
                 }
             }
         }
+        return false
+    }
+    movePieceAndCheck(board, from, to, color) {
+        let isUnderCheck = true
+        let _toElement = _.cloneDeep(utils.getElement(board, to))
+        this.movePiece(board, from, to)
+        isUnderCheck = this.isCheck(board, color)
         this.movePiece(board, to, from)
         utils.setElement(board, to, _toElement)
-        return isWithinPossibleMoves
+        return isUnderCheck
     }
     isValidMove(board, from, to) {
         let validPiece = true
@@ -338,7 +348,7 @@ class Moves {
 
         validPiece = utils.areSameColor(this.currentColor, utils.getElement(board, from))
         if (validPiece) {
-            const possibleMoves = this.getAllPossibleMoves(board, from, { removeInvalidMoves: true })
+            const possibleMoves = this.getPossibleMoves(board, from, { removeInvalidMoves: true })
             isWithinPossibleMoves = utils.includesPosition(possibleMoves, to)
         }
         return validPiece && isWithinPossibleMoves
@@ -349,9 +359,12 @@ class Moves {
     }
     makeMove(board, from, to) {
         let canMove = this.isValidMove(board, from, to)
+        let isCheck = false
         if (canMove) {
             this.movePiece(board, from, to)
             this.currentColor *= -1
+            isCheck = this.isCheck(board, this.currentColor)
+            this.underCheck = isCheck ? this.currentColor : 0
         }
     }
 }
