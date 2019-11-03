@@ -1,5 +1,5 @@
 {
-  "name": "simple-chess",
+  "name": "simple-chess-engine",
   "version": "2.0.0",
   "description": "A Multiplayer chess engine",
   "main": "index.js",
