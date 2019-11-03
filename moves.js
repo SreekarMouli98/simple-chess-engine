@@ -3,11 +3,13 @@ const utils = require('./utils')
 
 class Moves {
     constructor() {
-        this.currentColor = 1
-        this.underCheck = 0
+        this.currentColor = 1;
+        this.isCheck = false;
+        this.isCheckmate = false;
+        this.isStalemate = false;
     }
     getKingMoves(board, pos) {
-        const king       = utils.getElement(board, pos)
+        const king = utils.getElement(board, pos)
         const allOffsets = [
             //top
             [0, 1],
@@ -29,7 +31,7 @@ class Moves {
         let moves = []
         allOffsets.forEach(offset => {
             let offsetPos = utils.getOffsetPos(pos, offset)
-            let ele       = utils.getElement(board, offsetPos)
+            let ele = utils.getElement(board, offsetPos)
             let sameColor = utils.areSameColor(king, ele)
             if (ele !== undefined && !sameColor) {
                 moves.push(offsetPos)
@@ -40,15 +42,15 @@ class Moves {
     getKnightMoves(board, pos) {
         const knight = utils.getElement(board, pos)
         const allOffsets = [
-            [-2,  1], [-1,  2],
-            [ 2,  1], [ 1,  2],
-            [ 2, -1], [ 1, -2],
+            [-2, 1], [-1, 2],
+            [2, 1], [1, 2],
+            [2, -1], [1, -2],
             [-2, -1], [-1, -2]
         ]
         let moves = []
         allOffsets.forEach(offset => {
             let offsetPos = utils.getOffsetPos(pos, offset)
-            let ele       = utils.getElement(board, offsetPos)
+            let ele = utils.getElement(board, offsetPos)
             let sameColor = utils.areSameColor(knight, ele)
             if (ele !== undefined && !sameColor) {
                 moves.push(offsetPos)
@@ -58,12 +60,12 @@ class Moves {
     }
     getRookMoves(board, pos) {
         const rook = utils.getElement(board, pos)
-        let moves  = []
+        let moves = []
         //horizontal
         // going left
         for (let j = pos[1] - 1; j >= 0; j--) {
             const offsetPos = [pos[0], j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -81,7 +83,7 @@ class Moves {
         // going right
         for (let j = pos[1] + 1; j <= 7; j++) {
             const offsetPos = [pos[0], j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -101,7 +103,7 @@ class Moves {
         // going top
         for (let i = pos[0] - 1; i >= 0; i--) {
             const offsetPos = [i, pos[1]]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -119,7 +121,7 @@ class Moves {
         // going bottom
         for (let i = pos[0] + 1; i <= 7; i++) {
             const offsetPos = [i, pos[1]]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(rook, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -138,11 +140,11 @@ class Moves {
     }
     getBishopMoves(board, pos) {
         const bishop = utils.getElement(board, pos)
-        let moves    = []
+        let moves = []
         // top-left
-        for (let i = pos[0] - 1, j = pos[1] - 1; i >= 0 && j >= 0; i--, j--) {
+        for (let i = pos[0] - 1, j = pos[1] - 1; i >= 0 && j >= 0; i-- , j--) {
             const offsetPos = [i, j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -158,9 +160,9 @@ class Moves {
             }
         }
         // top-right
-        for (let i = pos[0] - 1, j = pos[1] + 1; i >= 0 && j <= 7; i--, j++) {
+        for (let i = pos[0] - 1, j = pos[1] + 1; i >= 0 && j <= 7; i-- , j++) {
             const offsetPos = [i, j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -176,9 +178,9 @@ class Moves {
             }
         }
         // bottom-right
-        for (let i = pos[0] + 1, j = pos[1] + 1; i <= 7 && j <= 7; i++, j++) {
+        for (let i = pos[0] + 1, j = pos[1] + 1; i <= 7 && j <= 7; i++ , j++) {
             const offsetPos = [i, j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -194,9 +196,9 @@ class Moves {
             }
         }
         // bottom-left
-        for (let i = pos[0] + 1, j = pos[1] - 1; i <= 7 && j >= 0; i++, j--) {
+        for (let i = pos[0] + 1, j = pos[1] - 1; i <= 7 && j >= 0; i++ , j--) {
             const offsetPos = [i, j]
-            const ele       = utils.getElement(board, offsetPos)
+            const ele = utils.getElement(board, offsetPos)
             const sameColor = utils.areSameColor(bishop, ele)
             if (ele !== undefined) {
                 if (ele === 0) {
@@ -221,16 +223,24 @@ class Moves {
     }
     getPawnMoves(board, pos) {
         const pawn = utils.getElement(board, pos)
-        let moves  = []
+        let moves = []
         if (pawn < 0) {
-            // bottom
-            const bottomPos = utils.getOffsetPos(pos, [0, -1])
-            const bottomEle = utils.getElement(board, bottomPos)
-            if (bottomEle !== undefined) {
-                if (bottomEle === 0) {
-                    moves.push(bottomPos)
-                }
+            let offsets = [
+                // bottom
+                [0, -1]
+            ];
+            if (pos[0] == 1) {
+                offsets.push([0, -2]);
             }
+            offsets.forEach(offset => {
+                const bottomPos = utils.getOffsetPos(pos, offset);
+                const bottomEle = utils.getElement(board, bottomPos);
+                if (bottomEle !== undefined) {
+                    if (bottomEle === 0) {
+                        moves.push(bottomPos);
+                    }
+                }
+            })
             const possibleOffsets = [
                 // bottom-left
                 [-1, -1],
@@ -239,7 +249,7 @@ class Moves {
             ]
             possibleOffsets.forEach(offset => {
                 const offsetPos = utils.getOffsetPos(pos, offset)
-                const ele       = utils.getElement(board, offsetPos)
+                const ele = utils.getElement(board, offsetPos)
                 const sameColor = utils.areSameColor(pawn, ele)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
@@ -250,14 +260,22 @@ class Moves {
             return moves
         }
         else if (pawn > 0) {
-            // top
-            const topPos = utils.getOffsetPos(pos, [0, 1])
-            const topEle = utils.getElement(board, topPos)
-            if (topEle !== undefined) {
-                if (topEle === 0) {
-                    moves.push(topPos)
-                }
+            let offsets = [
+                // top
+                [0, 1]
+            ];
+            if (pos[0] == 6) {
+                offsets.push([0, 2]);
             }
+            offsets.forEach(offset => {
+                const topPos = utils.getOffsetPos(pos, offset);
+                const topEle = utils.getElement(board, topPos);
+                if (topEle !== undefined) {
+                    if (topEle === 0) {
+                        moves.push(topPos);
+                    }
+                }
+            })
             const possibleOffsets = [
                 // top-left
                 [-1, 1],
@@ -266,7 +284,7 @@ class Moves {
             ]
             possibleOffsets.forEach(offset => {
                 const offsetPos = utils.getOffsetPos(pos, offset)
-                const ele       = utils.getElement(board, offsetPos)
+                const ele = utils.getElement(board, offsetPos)
                 const sameColor = utils.areSameColor(pawn, ele)
                 if (ele !== undefined) {
                     if (ele !== 0 && !sameColor) {
@@ -280,6 +298,11 @@ class Moves {
     getPossibleMoves(board, pos, options) {
         const piece = utils.getElement(board, pos)
         let moves = []
+        if (_.has(options, 'validPlayerCheck') && options.validPlayerCheck) {
+            if (!utils.areSameColor(this.currentColor, piece)) {
+                return moves;
+            }
+        }
         switch (piece) {
             case -6:
             case +6:
@@ -318,7 +341,7 @@ class Moves {
         }
         return moves
     }
-    isCheck(board, color) {
+    isUnderCheck(board, color) {
         let kingPos = utils.getPositions(board, color * 6)[0]
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -333,11 +356,37 @@ class Moves {
         }
         return false
     }
+    getAllPossibleMoves(board, color) {
+        const kingPos = utils.getPositions(board, color * 6)[0];
+        let allPossibleMoves = {};
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (utils.areSameColor(color, utils.getElement(board, [i, j]))) {
+                    let possibleMoves = this.getPossibleMoves(board, [i, j], { removeInvalidMoves: true });
+                    allPossibleMoves[JSON.stringify([i, j])] = possibleMoves;
+                }
+            }
+        }
+        return allPossibleMoves;
+    }
+    getBoardStatus(board) {
+        let isCheck = this.isUnderCheck(board, this.currentColor);
+        let allPossibleMoves = this.getAllPossibleMoves(board, this.currentColor);
+        let allMoves = _.flatten(_.values(allPossibleMoves));
+        let isCheckmate = isCheck && allMoves.length === 0;
+        let isStalemate = !isCheck && allMoves.length === 0;
+        return {
+            nextPlayer: utils.getColorName(this.currentColor),
+            isCheck,
+            isCheckmate,
+            isStalemate
+        };
+    }
     movePieceAndCheck(board, from, to, color) {
         let isUnderCheck = true
         let _toElement = _.cloneDeep(utils.getElement(board, to))
         this.movePiece(board, from, to)
-        isUnderCheck = this.isCheck(board, color)
+        isUnderCheck = this.isUnderCheck(board, color)
         this.movePiece(board, to, from)
         utils.setElement(board, to, _toElement)
         return isUnderCheck
@@ -359,13 +408,12 @@ class Moves {
     }
     makeMove(board, from, to) {
         let canMove = this.isValidMove(board, from, to)
-        let isCheck = false
         if (canMove) {
             this.movePiece(board, from, to)
             this.currentColor *= -1
-            isCheck = this.isCheck(board, this.currentColor)
-            this.underCheck = isCheck ? this.currentColor : 0
+            return true;
         }
+        return false;
     }
 }
 

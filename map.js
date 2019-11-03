@@ -6,7 +6,7 @@ class Map {
         ]
     }
     getAlphaPosition(pos) {
-        return 'ABCDEFGH'[pos[1]]+ (8 - pos[0]).toString()
+        return 'ABCDEFGH'[pos[1]] + (8 - pos[0]).toString()
     }
 }
 

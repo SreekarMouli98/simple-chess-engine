@@ -19,7 +19,7 @@ const setElement = (board, pos, ele) => {
     if (!isValidPosition(pos)) {
         return
     }
-    board[pos[0]][pos[1]] = ele   
+    board[pos[0]][pos[1]] = ele
 }
 
 const getOffsetPos = (pos, offset) => {
@@ -56,6 +56,42 @@ const includesPosition = (positions, pos) => {
     return _.findIndex(positions, eachPos => checkIfSamePosition(eachPos, pos)) !== -1
 }
 
+const getColorName = val => {
+    if (val > 0) color = 'white';
+    else if (val < 0) color = 'black';
+    else color = 'none';
+    return color;
+}
+
+const getPieceName = val => {
+    let piece;
+    val = Math.abs(val);
+    switch (val) {
+        case 1:
+            piece = 'pawn';
+            break;
+        case 2:
+            piece = 'rook';
+            break;
+        case 3:
+            piece = 'bishop';
+            break;
+        case 4:
+            piece = 'knight';
+            break;
+        case 5:
+            piece = 'queen';
+            break;
+        case 6:
+            piece = 'king';
+            break;
+        default:
+            piece = 'none';
+            break;
+    }
+    return piece;
+}
+
 module.exports = {
     areSameColor,
     getElement,
@@ -65,4 +101,6 @@ module.exports = {
     getPositions,
     checkIfSamePosition,
     includesPosition,
+    getColorName,
+    getPieceName,
 }
