@@ -74,10 +74,10 @@ const getPieceName = val => {
             piece = 'rook';
             break;
         case 3:
-            piece = 'bishop';
+            piece = 'knight';
             break;
         case 4:
-            piece = 'knight';
+            piece = 'bishop';
             break;
         case 5:
             piece = 'queen';
