@@ -1,9 +1,13 @@
 {
   "name": "simple-chess-engine",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A Multiplayer chess engine",
   "main": "index.js",
   "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mouli2105/simple-chess-engine.git"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {},
