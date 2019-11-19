@@ -12,14 +12,14 @@ class Game {
         this.board = [
             [-2, -3, -4, -5, -6, -4, -3, -2],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
             [+1, +1, +1, +1, +1, +1, +1, +1],
             [+2, +3, +4, +5, +6, +4, +3, +2]
         ];
-        moves.currentColor = 1;
+        moves.reset();
     }
     displayBoard() {
         const table = new Table({ head: ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] });
@@ -100,7 +100,7 @@ class Game {
     }
     getPossibleMoves(_pos) {
         const pos = mapper.getNumericPosition(_pos);
-        let possibleMoves = moves.getPossibleMoves(this.board, pos, { removeInvalidMoves: true, validPlayerCheck: true, flag: true });
+        let possibleMoves = moves.getPossibleMoves(this.board, pos, { removeInvalidMoves: true, validPlayerCheck: true});
         possibleMoves = _.map(possibleMoves, move => mapper.getAlphaPosition(move));
         return possibleMoves;
     }

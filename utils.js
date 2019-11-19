@@ -57,6 +57,7 @@ const includesPosition = (positions, pos) => {
 }
 
 const getColorName = val => {
+    let color;
     if (val > 0) color = 'white';
     else if (val < 0) color = 'black';
     else color = 'none';

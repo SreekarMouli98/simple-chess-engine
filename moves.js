@@ -3,14 +3,24 @@ const utils = require('./utils')
 
 class Moves {
     constructor() {
+        this.reset();
+    }
+    reset() {
         this.currentColor = 1;
         this.isCheck = false;
         this.isCheckmate = false;
         this.isStalemate = false;
+        this.castlingInfo = [/*{ pos: [], rookFrom: [], rookTo: [] }*/];
+        this.whiteKingMoved = false;
+        this.whiteQueenSideRookMoved = false;
+        this.whiteKingSideRookMoved = false;
+        this.blackKingMoved = false;
+        this.blackQueenSideRookMoved = false;
+        this.blackKingSideRookMoved = false;
     }
     getKingMoves(board, pos) {
         const king = utils.getElement(board, pos)
-        const allOffsets = [
+        let allOffsets = [
             //top
             [0, 1],
             //top-right
@@ -28,6 +38,106 @@ class Moves {
             //top-left
             [-1, 1],
         ]
+        // Support for Castling
+        if (!this.isCheck) {
+            let kingPos = pos;
+            if (this.currentColor > 0 && utils.checkIfSamePosition(kingPos, [7, 4]) && !this.whiteKingMoved) {
+                if (utils.getElement(board, [7, 0]) === 2 && !this.whiteQueenSideRookMoved) {
+                    let queenSideCastling = true;
+                    for (let j = 1; j < kingPos[1]; j++) {
+                        if (utils.getElement(board, [7, j]) !== 0) {
+                            queenSideCastling = false;
+                            break;
+                        }
+                    }
+                    for (let j = kingPos[1] - 2; j < kingPos[1] && queenSideCastling; j++) {
+                        if (this.movePieceAndCheck(board, kingPos, [7, j], this.currentColor)) {
+                            queenSideCastling = false;
+                            break;
+                        }
+                    }
+                    if (queenSideCastling) {
+                        this.castlingInfo.push({
+                            pos: utils.getOffsetPos(pos, [-2, 0]),
+                            rookFrom: [7, 0],
+                            rookTo: [7, 3]
+                        });
+                        allOffsets.push([-2, 0])
+                    }
+                }
+                if (utils.getElement(board, [7, 7]) === 2 && !this.whiteKingSideRookMoved) {
+                    let kingSideCastling = true;
+                    for (let j = 6; j > kingPos[1] + 1; j--) {
+                        if (utils.getElement(board, [7, j]) !== 0) {
+                            kingSideCastling = false;
+                            break;
+                        }
+                    }
+                    for (let j = kingPos[1] + 1; j <= kingPos[1] + 2 && kingSideCastling; j++) {
+                        if (this.movePieceAndCheck(board, kingPos, [7, j], this.currentColor)) {
+                            kingSideCastling = false;
+                            break;
+                        }
+                    }
+                    if (kingSideCastling) {
+                        this.castlingInfo.push({
+                            pos: utils.getOffsetPos(pos, [2, 0]),
+                            rookFrom: [7, 7],
+                            rookTo: [7, 5]
+                        })
+                        allOffsets.push([2, 0]);
+                    }
+                }
+            }
+            else if (this.currentColor < 0 && utils.checkIfSamePosition(kingPos, [0, 4]) && !this.blackKingMoved) {
+                if (utils.getElement(board, [0, 0]) === -2 && !this.blackQueenSideRookMoved) {
+                    let queenSideCastling = true;
+                    for (let j = 1; j < kingPos[1]; j++) {
+                        if (utils.getElement(board, [0, j]) !== 0) {
+                            queenSideCastling = false;
+                            break;
+                        }
+                    }
+                    for (let j = kingPos[1] - 2; j < kingPos[1] && queenSideCastling; j++) {
+                        if (this.movePieceAndCheck(board, kingPos, [0, j], this.currentColor)) {
+                            queenSideCastling = false;
+                            break;
+                        }
+                    }
+                    if (queenSideCastling) {
+                        this.castlingInfo.push({
+                            pos: utils.getOffsetPos(pos, [-2, 0]),
+                            rookFrom: [0, 0],
+                            rookTo: [0, 3]
+                        });
+                        allOffsets.push([-2, 0])
+                    }
+                }
+                if (utils.getElement(board, [0, 7]) === -2 && !this.blackKingSideRookMoved) {
+                    let kingSideCastling = true;
+                    for (let j = kingPos[1] + 1; j < 7; j++) {
+                        if (utils.getElement(board, [0, j]) !== 0) {
+                            kingSideCastling = false;
+                            break;
+                        }
+                    }
+                    for (let j = kingPos[1] + 1; j <= kingPos[1] + 2 && kingSideCastling; j++) {
+                        if (this.movePieceAndCheck(board, kingPos, [0, j], this.currentColor)) {
+                            kingSideCastling = false;
+                            break;
+                        }
+                    }
+                    if (kingSideCastling) {
+                        this.castlingInfo.push({
+                            pos: utils.getOffsetPos(pos, [2, 0]),
+                            rookFrom: [0, 7],
+                            rookTo: [0, 5]
+                        })
+                        allOffsets.push([2, 0]);
+                    }
+                }
+            }
+        }
         let moves = []
         allOffsets.forEach(offset => {
             let offsetPos = utils.getOffsetPos(pos, offset)
@@ -229,7 +339,7 @@ class Moves {
                 // bottom
                 [0, -1]
             ];
-            if (pos[0] == 1) {
+            if (pos[0] === 1) {
                 offsets.push([0, -2]);
             }
             offsets.forEach(offset => {
@@ -264,7 +374,7 @@ class Moves {
                 // top
                 [0, 1]
             ];
-            if (pos[0] == 6) {
+            if (pos[0] === 6) {
                 offsets.push([0, 2]);
             }
             offsets.forEach(offset => {
@@ -409,7 +519,31 @@ class Moves {
     makeMove(board, from, to) {
         let canMove = this.isValidMove(board, from, to)
         if (canMove) {
+            if (utils.checkIfSamePosition(from, [0, 4])) {
+                this.blackKingMoved = true;
+            }
+            else if (utils.checkIfSamePosition(from, [0, 0])) {
+                this.blackQueenSideRookMoved = true;
+            }
+            else if (utils.checkIfSamePosition(from, [0, 7])) {
+                this.blackKingSideRookMoved = true;
+            }
+            else if (utils.checkIfSamePosition(from, [7, 4])) {
+                this.whiteKingMoved = true;
+            }
+            else if (utils.checkIfSamePosition(from, [7, 0])) {
+                this.whiteQueenSideRookMoved = true;
+            }
+            else if (utils.checkIfSamePosition(from , [7, 7])) {
+                this.whiteKingSideRookMoved = true;
+            }
             this.movePiece(board, from, to)
+            let castlingInfo = _.find(this.castlingInfo, ['pos', to]);
+            if (castlingInfo) {
+                let { rookFrom, rookTo } = castlingInfo;
+                this.movePiece(board, rookFrom, rookTo);
+            }
+            this.castlingInfo = [];
             this.currentColor *= -1
             return true;
         }
