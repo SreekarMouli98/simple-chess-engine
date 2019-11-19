@@ -19,7 +19,7 @@ class Game {
             [+1, +1, +1, +1, +1, +1, +1, +1],
             [+2, +3, +4, +5, +6, +4, +3, +2]
         ];
-        moves.currentColor = 1;
+        moves.reset();
     }
     displayBoard() {
         const table = new Table({ head: ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] });
