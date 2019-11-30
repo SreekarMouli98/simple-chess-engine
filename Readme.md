@@ -1,11 +1,6 @@
 ## Simple-Chess - A Multiplayer Chess Engine
 `Simple-Chess` is a multiplayer chess-engine which keeps track of the board and produces valid possbile moves.
 
-## Installation
-```
-npm i simple-chess-engine
-```
-
 ## Usage
 ```javascript
 const SimpleChessEngine = require('simple-chess-engine');
@@ -31,6 +26,14 @@ game.makeMove('B1', 'C3');
 //         "isCheckmate": false,
 //         "isStalemate": false
 //     }
+// }
+
+game.undo();
+// {
+//     "nextPlayer": "white",
+//     "isCheck": false,
+//     "isCheckmate": false,
+//     "isStalemate": false
 // }
 
 game.getBoard({ format: 'JSON' });
