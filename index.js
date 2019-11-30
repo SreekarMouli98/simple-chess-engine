@@ -43,7 +43,7 @@ class Game {
         const to = mapper.getNumericPosition(_to)
         let moveStatus = {
             success: false,
-            status: moves.getBoardStatus(this.board)
+            status: this.getStatus(this.board)
         };
 
         if (from.length !== 2 && to.length !== 2) {
@@ -58,7 +58,7 @@ class Game {
         moveStatus.success = moves.makeMove(this.board, from, to);
 
         if (moveStatus.success) {
-            moveStatus.status = moves.getBoardStatus(this.board);
+            moveStatus.status = this.getStatus(this.board);
         }
 
         return moveStatus;
@@ -105,7 +105,16 @@ class Game {
         return possibleMoves;
     }
     getStatus() {
-        return moves.getBoardStatus(this.board);
+        return {
+            nextPlayer: utils.getColorName(moves.currentColor),
+            isCheck: moves.isCheck,
+            isCheckmate: moves.isCheckmate,
+            isStalemate: moves.isStalemate
+        };
+    }
+    undo() {
+        moves.undo(this.board);
+        return this.getStatus();
     }
 }
 

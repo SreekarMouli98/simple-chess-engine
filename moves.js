@@ -17,6 +17,7 @@ class Moves {
         this.blackKingMoved = false;
         this.blackQueenSideRookMoved = false;
         this.blackKingSideRookMoved = false;
+        this.history = [/* {movesMade: [], gameState: {}} */];
     }
     getKingMoves(board, pos) {
         const king = utils.getElement(board, pos)
@@ -479,18 +480,26 @@ class Moves {
         }
         return allPossibleMoves;
     }
-    getBoardStatus(board) {
-        let isCheck = this.isUnderCheck(board, this.currentColor);
+    getGameState() {
+        return {
+            currentColor: this.currentColor,
+            isCheck: this.isCheck,
+            isCheckmate: this.isCheckmate,
+            isStalemate: this.isStalemate,
+            whiteKingMoved: this.whiteKingMoved,
+            whiteQueenSideRookMoved: this.whiteQueenSideRookMoved,
+            whiteKingSideRookMoved: this.whiteKingSideRookMoved,
+            blackKingMoved: this.blackKingMoved,
+            blackQueenSideRookMoved: this.blackQueenSideRookMoved,
+            blackKingSideRookMoved: this.blackKingSideRookMoved
+        };
+    }
+    setGameStatus(board) {
+        this.isCheck = this.isUnderCheck(board, this.currentColor);
         let allPossibleMoves = this.getAllPossibleMoves(board, this.currentColor);
         let allMoves = _.flatten(_.values(allPossibleMoves));
-        let isCheckmate = isCheck && allMoves.length === 0;
-        let isStalemate = !isCheck && allMoves.length === 0;
-        return {
-            nextPlayer: utils.getColorName(this.currentColor),
-            isCheck,
-            isCheckmate,
-            isStalemate
-        };
+        this.isCheckmate = this.isCheck && allMoves.length === 0;
+        this.isStalemate = !this.isCheck && allMoves.length === 0;
     }
     movePieceAndCheck(board, from, to, color) {
         let isUnderCheck = true
@@ -519,6 +528,18 @@ class Moves {
     makeMove(board, from, to) {
         let canMove = this.isValidMove(board, from, to)
         if (canMove) {
+            // Getting state of game before moving piece
+            let gameState = this.getGameState();
+
+            // Adding moves that will be made to this array
+            let movesMade = [];
+            movesMade.push({
+                from,
+                to,
+                toElement: utils.getElement(board, to)
+            });
+
+            // Checking ihe king/rook has moved
             if (utils.checkIfSamePosition(from, [0, 4])) {
                 this.blackKingMoved = true;
             }
@@ -534,20 +555,71 @@ class Moves {
             else if (utils.checkIfSamePosition(from, [7, 0])) {
                 this.whiteQueenSideRookMoved = true;
             }
-            else if (utils.checkIfSamePosition(from , [7, 7])) {
+            else if (utils.checkIfSamePosition(from, [7, 7])) {
                 this.whiteKingSideRookMoved = true;
             }
+
+            // Moving piece
             this.movePiece(board, from, to)
+
+            // Checking if current move being made is castling
             let castlingInfo = _.find(this.castlingInfo, ['pos', to]);
             if (castlingInfo) {
                 let { rookFrom, rookTo } = castlingInfo;
+
+                // Pushing the castling move to array
+                movesMade.push({
+                    from: rookFrom,
+                    to: rookTo,
+                    toElement: utils.getElement(board, rookTo)
+                });
+
+                // Checking if the rook has made
+                if (utils.checkIfSamePosition(rookFrom, [0, 0])) {
+                    this.blackQueenSideRookMoved = true;
+                }
+                else if (utils.checkIfSamePosition(rookFrom, [0, 7])) {
+                    this.blackKingSideRookMoved = true;
+                }
+                else if (utils.checkIfSamePosition(rookFrom, [7, 0])) {
+                    this.whiteQueenSideRookMoved = true;
+                }
+                else if (utils.checkIfSamePosition(rookFrom, [7, 7])) {
+                    this.whiteKingSideRookMoved = true;
+                }
+
+                // Moving additional piece (for castling);
                 this.movePiece(board, rookFrom, rookTo);
             }
+
+            // Reset Castling Info
             this.castlingInfo = [];
+
+            // Pushing movesMade and gameState(before move(s) was made) to history
+            this.history.push({ movesMade, gameState });
+
+            // Changing the players's turn
             this.currentColor *= -1
+
+            // Updating the board status
+            this.setGameStatus(board, from);
             return true;
         }
         return false;
+    }
+    undo(board) {
+        let { movesMade, gameState } = this.history.pop();
+        if (movesMade && movesMade.length !== 0) {
+            _.map(movesMade, move => {
+                this.movePiece(board, move.to, move.from);
+                utils.setElement(board, move.to, move.toElement);
+            });
+        }
+        if (gameState) {
+            _.map(_.keys(gameState), key => {
+                this[key] = gameState[key];
+            });
+        }
     }
 }
 
