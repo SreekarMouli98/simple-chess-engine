@@ -10,7 +10,7 @@
 6. Supports undo
 7. Load custom board <sup>**(new)**</sup>
 
-### API
+## API
  * <a href='#create-game'>Create Game</a>
  * <a href='#get-status'>Get Game Status</a>
  * <a href='#get-possible-moves'>Get Possible Moves</a>
