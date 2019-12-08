@@ -64,6 +64,14 @@ const getColorName = val => {
     return color;
 }
 
+const getColorValByName = name => {
+    if (!name) return 0;
+    name = name.toLowerCase();
+    if (name === 'white') return 1;
+    else if (name === 'black') return -1;
+    else return 0;
+}
+
 const getPieceName = val => {
     let piece;
     val = Math.abs(val);
@@ -93,6 +101,27 @@ const getPieceName = val => {
     return piece;
 }
 
+const getPieceValByName = piece => {
+    if (!piece) return 0;
+    piece = piece.toLowerCase();
+    switch (piece) {
+        case 'pawn':
+            return 1;
+        case 'rook':
+            return 2;
+        case 'knight':
+            return 3;
+        case 'bishop':
+            return 4;
+        case 'queen':
+            return 5;
+        case 'king':
+            return 6;
+        default:
+            return 0;
+    }
+}
+
 module.exports = {
     areSameColor,
     getElement,
@@ -103,5 +132,7 @@ module.exports = {
     checkIfSamePosition,
     includesPosition,
     getColorName,
+    getColorValByName,
     getPieceName,
+    getPieceValByName,
 }
