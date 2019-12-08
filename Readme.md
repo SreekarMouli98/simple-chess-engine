@@ -1,9 +1,7 @@
 ## Simple-Chess-Engine
----
 `simple-chess-engine` is a multiplayer chess engine which keeps track of the board and produces valid possbile moves.
 
 ## Features
----
 1. Accepts algebraic notation
 2. Lists possible valid moves
 3. Check detection
@@ -13,7 +11,6 @@
 7. Load custom board <sup>**(new)**</sup>
 
 ### API
----
  * <a href='#create-game'>Create Game</a>
  * <a href='#get-status'>Get Game Status</a>
  * <a href='#get-possible-moves'>Get Possible Moves</a>
@@ -25,15 +22,14 @@
  * <a href='#debug'>Debug Board</a>
 
 ## Usage
----
 <h4 id='create-game'>Create Game</h4>
-```js
+<pre><code>
 const SimpleChessEngine = require('simple-chess-engine');
 const game = new SimpleChessEngine();
-```
+</code></pre>
 
 <h4 id='get-status'>Get Game Status</h4>
-```js
+<pre><code>
 /**
  * Returns the current status of the game
  * 
@@ -46,11 +42,10 @@ const game = new SimpleChessEngine();
  }
  */
 game.getStatus();
-
-```
+</code></pre>
 
 <h4 id='get-possible-moves'>Get Possible Moves</h4>
-```js
+<pre><code>
 /**
  * Returns all the valid possible moves of a piece at the given position
  * @param {string} position
@@ -59,10 +54,10 @@ game.getStatus();
  ["A3", "C3"]
  */
 game.getPossibleMoves('B1');
-```
+</code></pre>
 
 <h4 id='move-piece'>Move Piece</h4>
-```js
+<pre><code>
 /**
  * Used to move a piece from source position to destination position
  * @param {string} source
@@ -82,10 +77,10 @@ game.getPossibleMoves('B1');
  * NOTE :: In order to get the updated board, use the getBoard() method.
  */
 game.makeMove('B1', 'C3');
-```
+</code></pre>
 
 <h4 id='undo'>Undo</h4>
-```js
+<pre><code>
 /**
  * Used to undo any previosly made move
  * 
@@ -98,12 +93,12 @@ game.makeMove('B1', 'C3');
  }
  *
  * NOTE :: In order to get the updated board, use the getBoard() method.
- */
+ javascript
 game.undo();
-```
+</code></pre>
 
 <h4 id='get-board'>Get Complete Board</h4>
-```js
+<pre><code>
 /**
  * Used to return the complete board
  * 
@@ -116,7 +111,7 @@ game.undo();
  {
      "A8": {
          "color": "black",
-         "piece": "rook"
+         javascriptiece": "rook"
      },
      "B8": {
          "color": "black",
@@ -126,10 +121,10 @@ game.undo();
  }
  */
 game.getBoard();
-```
+</code></pre>
 
 <h4 id='load-board'>Load Custom Board</h4>
-```js
+<pre><code>
 let content = JSON.stringify({
     A1: { color: "white", piece: "king" },
     C1: { color: "black", piece: "king" },
@@ -162,10 +157,10 @@ let opts = { firstPlayer: 'white' };
     }
  */
 game.loadBoard(content, opts);
-```
+</code></pre>
 
 <h4 id='reset'>Reset Game</h4>
-```js
+<pre><code>
 let opts = { custom: true };
 /**
  * Used to reset the board
@@ -178,12 +173,12 @@ let opts = { custom: true };
  * NOTE :: In order to get the updated board, use the getBoard() method.
  */
 game.resetGame();
-```
+</code></pre>
 
 <h4 id='debug'>Debug Board</h4>
-```js
+<pre><code type='javascript'>
 /**
  * Logs the complete chess board to the console
  */
 game.displayBoard();
-```
+</code></pre>
