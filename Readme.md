@@ -36,7 +36,7 @@ game.undo();
 //     "isStalemate": false
 // }
 
-game.getBoard({ format: 'JSON' });
+game.getBoard();
 // {
 //     "A8": {
 //         "color": "black",
@@ -56,31 +56,6 @@ game.getBoard({ format: 'JSON' });
 //     },
 //     ...
 // }
-
-game.getBoard({ format: 'Array' });
-// [
-//     {
-//         "position": "A8",
-//         "color": "black",
-//         "piece": "rook"
-//     },
-//     {
-//         "position": "B8",
-//         "color": "black",
-//         "piece": "bishop"
-//     },
-//     {
-//         "position": "C8",
-//         "color": "black",
-//         "piece": "knight"
-//     },
-//     {
-//         "position": "D8",
-//         "color": "black",
-//         "piece": "queen"
-//     }
-//     ...
-// ]
 
 game.displayBoard(); // logs board to console
 /*

@@ -79,6 +79,7 @@ class Game {
                     }
                 }
                 break;
+            /*
             case 'ARRAY':
                 let board = [];
                 for (let i = 0; i < this.board.length; i++) {
@@ -92,6 +93,7 @@ class Game {
                 }
                 resp = board;
                 break;
+            */
             default:
                 resp = 'unsupported format provided';
                 break;
