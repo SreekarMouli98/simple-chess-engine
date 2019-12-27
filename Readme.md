@@ -192,3 +192,8 @@ game.resetGame();
  */
 game.displayBoard();
 ```
+
+---
+*If you find this useful, you can support me by donating here...*
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/SreekarMouli)
