@@ -196,4 +196,6 @@ game.displayBoard();
 ---
 *If you find this useful, you can support me by donating here...*
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/SreekarMouli)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/SreekarMouli)
+[![Donate](https://img.shields.io/badge/Donate-Instamojo-green.svg)](https://www.instamojo.com/@SreekarMouli/)
+<sup><sub>*(Supports GPay, Paytm, PhonePe, BHIM UPI, Credit Cards, Debit Cards, Netbanking...)*</sub></sup>
