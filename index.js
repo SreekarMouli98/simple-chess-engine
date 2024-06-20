@@ -2,7 +2,6 @@ const _ = require('lodash')
 const mapper = require('./map')
 const moves = require('./moves')
 const utils = require('./utils')
-const Table = require('cli-table');
 
 class Game {
     constructor() {
@@ -31,23 +30,6 @@ class Game {
             };
         }
         moves.reset();
-    }
-    displayBoard() {
-        const table = new Table({ head: ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] });
-        _.map(this.board, (row, index) => {
-            row = _.map(row, piece => {
-                let color = utils.getColorName(piece).toUpperCase();
-                let pieceName = utils.getPieceName(piece).toUpperCase();
-                if (color === 'NONE' || pieceName === 'NONE') {
-                    return '';
-                }
-                else {
-                    return `${color} ${pieceName}`
-                }
-            });
-            table.push({ [8 - index]: row });
-        });
-        console.log(table.toString());
     }
     makeMove(_from, _to) {
         const from = mapper.getNumericPosition(_from)
