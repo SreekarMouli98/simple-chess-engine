@@ -4,7 +4,8 @@
   "description": "A Multiplayer chess engine",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "bench": "node bench/benchmark.js"
   },
   "repository": {
     "type": "git",
