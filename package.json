@@ -13,6 +13,7 @@
   },
   "author": "",
   "license": "ISC",
+  "packageManager": "pnpm@10.28.0",
   "dependencies": {
     "lodash": "^4.17.11"
   },
