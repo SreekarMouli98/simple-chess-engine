@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "bench": "node bench/benchmark.js"
+    "bench": "node bench/benchmark.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,7 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "jest": "^30.2.0"
+    "jest": "^30.2.0",
+    "prettier": "^3.4.2"
   }
 }
