@@ -2,18 +2,13 @@
  * Move generation for chess engine
  */
 
-import { BitBoard, Side } from './internal.types';
-import {
-  FILE_A,
-  FILE_B,
-  FILE_G,
-  FILE_H,
-  FULL_BOARD,
-} from './position';
+import type { BitBoard } from './internal.types';
+import type { Side } from './public.types';
+import { FILE_A, FILE_B, FILE_G, FILE_H, FULL_BOARD } from './position';
 
-export const getPawnMoves = (pawn: BitBoard, sideToMove: Side): BitBoard => {
+export const getPawnMoves = (pawn: BitBoard, turn: Side): BitBoard => {
   const allowedMoves =
-    sideToMove === 'white'
+    turn === 'white'
       ? (pawn << 8n) & FULL_BOARD // white pawn forward
       : (pawn >> 8n) & FULL_BOARD; // black pawn forward
   return allowedMoves;
@@ -36,14 +31,14 @@ export const getRookMoves = (rook: BitBoard): BitBoard => {
 
 export const getKnightMoves = (knight: BitBoard): BitBoard => {
   const allowedMoves =
-    (knight << 16n >> 1n) & ~FILE_A & FULL_BOARD | // 2 squares forward and 1 square right
-    (knight >> 2n << 8n) & ~FILE_A & ~FILE_B & FULL_BOARD | // 2 squares right and 1 square forward
-    (knight >> 2n >> 8n) & ~FILE_A & ~FILE_B | // 2 squares right and 1 square backward
-    (knight >> 16n >> 1n) & ~FILE_A | // 2 squares backward and 1 square right
-    (knight >> 16n << 1n) & ~FILE_H | // 2 squares backward and 1 square left
-    (knight << 2n >> 8n) & ~FILE_H & ~FILE_G & FULL_BOARD | // 2 squares left and 1 square backward
-    (knight << 2n << 8n) & ~FILE_H & ~FILE_G & FULL_BOARD | // 2 squares left and 1 square forward
-    (knight << 16n << 1n) & ~FILE_H & FULL_BOARD; // 2 squares forward and 1 square left
+    (((knight << 16n) >> 1n) & ~FILE_A & FULL_BOARD) | // 2 squares forward and 1 square right
+    (((knight >> 2n) << 8n) & ~FILE_A & ~FILE_B & FULL_BOARD) | // 2 squares right and 1 square forward
+    (((knight >> 2n) >> 8n) & ~FILE_A & ~FILE_B) | // 2 squares right and 1 square backward
+    (((knight >> 16n) >> 1n) & ~FILE_A) | // 2 squares backward and 1 square right
+    (((knight >> 16n) << 1n) & ~FILE_H) | // 2 squares backward and 1 square left
+    (((knight << 2n) >> 8n) & ~FILE_H & ~FILE_G & FULL_BOARD) | // 2 squares left and 1 square backward
+    (((knight << 2n) << 8n) & ~FILE_H & ~FILE_G & FULL_BOARD) | // 2 squares left and 1 square forward
+    (((knight << 16n) << 1n) & ~FILE_H & FULL_BOARD); // 2 squares forward and 1 square left
   return allowedMoves;
 };
 
