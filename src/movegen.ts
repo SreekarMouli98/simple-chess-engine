@@ -6,10 +6,6 @@ import { BitBoard, Side } from './internal.types';
 import {
   FILE_A,
   FILE_B,
-  FILE_C,
-  FILE_D,
-  FILE_E,
-  FILE_F,
   FILE_G,
   FILE_H,
   FULL_BOARD,
@@ -24,77 +20,50 @@ export const getPawnMoves = (pawn: BitBoard, sideToMove: Side): BitBoard => {
 };
 
 export const getRookMoves = (rook: BitBoard): BitBoard => {
+  let allowedMoves = 0n;
+  let leftMask = FILE_H;
+  let rightMask = FILE_A;
+  for (let i = 1n; i <= 7n; i++) {
+    allowedMoves |= (rook << (8n * i)) & FULL_BOARD; // forward moves
+    allowedMoves |= rook >> (8n * i); // backward moves
+    allowedMoves |= (rook << i) & ~leftMask & FULL_BOARD; // left moves
+    allowedMoves |= (rook >> i) & ~rightMask; // right moves
+    leftMask |= leftMask << 1n;
+    rightMask |= rightMask >> 1n;
+  }
+  return allowedMoves;
+};
+
+export const getKnightMoves = (knight: BitBoard): BitBoard => {
   const allowedMoves =
-    ((rook << (8n * 7n)) & FULL_BOARD) | // 7 squares forward
-    ((rook << (8n * 6n)) & FULL_BOARD) | // 6 squares forward
-    ((rook << (8n * 5n)) & FULL_BOARD) | // 5 squares forward
-    ((rook << (8n * 4n)) & FULL_BOARD) | // 4 squares forward
-    ((rook << (8n * 3n)) & FULL_BOARD) | // 3 squares forward
-    ((rook << (8n * 2n)) & FULL_BOARD) | // 2 squares forward
-    ((rook << (8n * 1n)) & FULL_BOARD) | // 1 square forward
-    ((rook >> (8n * 1n)) & FULL_BOARD) | // 1 square backward
-    ((rook >> (8n * 2n)) & FULL_BOARD) | // 2 squares backward
-    ((rook >> (8n * 3n)) & FULL_BOARD) | // 3 squares backward
-    ((rook >> (8n * 4n)) & FULL_BOARD) | // 4 squares backward
-    ((rook >> (8n * 5n)) & FULL_BOARD) | // 5 squares backward
-    ((rook >> (8n * 6n)) & FULL_BOARD) | // 6 squares backward
-    ((rook >> (8n * 7n)) & FULL_BOARD) | // 7 squares backward
-    ((rook << 1n) & ~FILE_H & FULL_BOARD) | // 1 square left
-    ((rook << 2n) & ~FILE_H & ~FILE_G & FULL_BOARD) | // 2 squares left
-    ((rook << 3n) & ~FILE_H & ~FILE_G & ~FILE_F & FULL_BOARD) | // 3 squares left
-    ((rook << 4n) & ~FILE_H & ~FILE_G & ~FILE_F & ~FILE_E & FULL_BOARD) | // 4 squares left
-    ((rook << 5n) &
-      ~FILE_H &
-      ~FILE_G &
-      ~FILE_F &
-      ~FILE_E &
-      ~FILE_D &
-      FULL_BOARD) | // 5 squares left
-    ((rook << 6n) &
-      ~FILE_H &
-      ~FILE_G &
-      ~FILE_F &
-      ~FILE_E &
-      ~FILE_D &
-      ~FILE_C &
-      FULL_BOARD) | // 6 squares left
-    ((rook << 7n) &
-      ~FILE_H &
-      ~FILE_G &
-      ~FILE_F &
-      ~FILE_E &
-      ~FILE_D &
-      ~FILE_C &
-      ~FILE_B &
-      FULL_BOARD) | // 7 squares left
-    ((rook >> 1n) & ~FILE_A & FULL_BOARD) | // 1 square right
-    ((rook >> 2n) & ~FILE_A & ~FILE_B & FULL_BOARD) | // 2 squares right
-    ((rook >> 3n) & ~FILE_A & ~FILE_B & ~FILE_C & FULL_BOARD) | // 3 squares right
-    ((rook >> 4n) & ~FILE_A & ~FILE_B & ~FILE_C & ~FILE_D & FULL_BOARD) | // 4 squares right
-    ((rook >> 5n) &
-      ~FILE_A &
-      ~FILE_B &
-      ~FILE_C &
-      ~FILE_D &
-      ~FILE_E &
-      FULL_BOARD) | // 5 squares right
-    ((rook >> 6n) &
-      ~FILE_A &
-      ~FILE_B &
-      ~FILE_C &
-      ~FILE_D &
-      ~FILE_E &
-      ~FILE_F &
-      FULL_BOARD) | // 6 squares right
-    ((rook >> 7n) &
-      ~FILE_A &
-      ~FILE_B &
-      ~FILE_C &
-      ~FILE_D &
-      ~FILE_E &
-      ~FILE_F &
-      ~FILE_G &
-      FULL_BOARD); // 7 squares right
+    (knight << 16n >> 1n) & ~FILE_A & FULL_BOARD | // 2 squares forward and 1 square right
+    (knight >> 2n << 8n) & ~FILE_A & ~FILE_B & FULL_BOARD | // 2 squares right and 1 square forward
+    (knight >> 2n >> 8n) & ~FILE_A & ~FILE_B | // 2 squares right and 1 square backward
+    (knight >> 16n >> 1n) & ~FILE_A | // 2 squares backward and 1 square right
+    (knight >> 16n << 1n) & ~FILE_H | // 2 squares backward and 1 square left
+    (knight << 2n >> 8n) & ~FILE_H & ~FILE_G & FULL_BOARD | // 2 squares left and 1 square backward
+    (knight << 2n << 8n) & ~FILE_H & ~FILE_G & FULL_BOARD | // 2 squares left and 1 square forward
+    (knight << 16n << 1n) & ~FILE_H & FULL_BOARD; // 2 squares forward and 1 square left
+  return allowedMoves;
+};
+
+export const getBishopMoves = (bishop: BitBoard): BitBoard => {
+  let allowedMoves = 0n;
+  let leftMask = FILE_H;
+  let rightMask = FILE_A;
+  for (let i = 1n; i <= 7n; i++) {
+    allowedMoves |= (bishop << (9n * i)) & ~leftMask & FULL_BOARD; // forward-left moves
+    allowedMoves |= (bishop << (7n * i)) & ~rightMask & FULL_BOARD; // forward-right moves
+    allowedMoves |= (bishop >> (7n * i)) & ~leftMask; // backward-left moves
+    allowedMoves |= (bishop >> (9n * i)) & ~rightMask; // backward-right moves
+    leftMask |= leftMask << 1n;
+    rightMask |= rightMask >> 1n;
+  }
+  return allowedMoves;
+};
+
+export const getQueenMoves = (queen: BitBoard): BitBoard => {
+  const allowedMoves = getRookMoves(queen) | getBishopMoves(queen);
   return allowedMoves;
 };
 
