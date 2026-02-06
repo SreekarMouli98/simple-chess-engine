@@ -2,8 +2,8 @@
  * Move generation for chess engine
  */
 
-import type { BitBoard } from './internal.types';
-import type { Side } from './public.types';
+import type { BitBoard } from './types';
+import type { Side } from './types';
 import { FILE_A, FILE_B, FILE_G, FILE_H, FULL_BOARD } from './position';
 
 export const getPawnMoves = (pawn: BitBoard, turn: Side): BitBoard => {

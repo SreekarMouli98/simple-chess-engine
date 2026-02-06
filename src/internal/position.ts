@@ -15,7 +15,7 @@
  *  1   0 0 0 0 0 0 0 0   ← last line (rank 1, White's back rank)
  */
 
-import type { BitBoard } from './internal.types';
+import type { BitBoard } from './types';
 
 const bbFromGrid = (grid: string): BitBoard =>
   BigInt('0b' + grid.replace(/\s/g, ''));
