@@ -1,6 +1,6 @@
-import { BoardFile, Position, Rank, Move } from '../types';
-import { iterBits } from './util';
-import { Square, EncodedMove, BitBoard } from './types';
+import { BoardFile, Position, Rank, Move } from '@src/types';
+import { iterBits } from '@src/internal/util';
+import { Square, EncodedMove, BitBoard } from '@src/internal/types';
 
 const BIT_MASK = 0b111111;
 
@@ -26,6 +26,12 @@ export const decodeMove = (encodedMove: EncodedMove): Move => {
   return move;
 };
 
+export const encodeMove = (move: Move): EncodedMove => {
+  const encodedFrom = positionToSquare(move.from);
+  const encodedTo = positionToSquare(move.to);
+  return (encodedFrom << 6) | encodedTo;
+};
+
 export const bitBoardToSquare = (bb: BitBoard): Square => {
   if (bb === 0n) {
     throw new Error('Bit board is empty');
@@ -41,7 +47,16 @@ export const bitBoardToSquare = (bb: BitBoard): Square => {
   return newIndex;
 };
 
-export const encodeMove = (from: BitBoard, to: BitBoard): EncodedMove[] => {
+export const squareToBitBoard = (square: Square): BitBoard => {
+  const col = square % 8;
+  const row = Math.floor(square / 8);
+  return 1n << BigInt(row * 8 + (7 - col));
+};
+
+export const bitBoardsToEncodedMove = (
+  from: BitBoard,
+  to: BitBoard
+): EncodedMove[] => {
   const encodedFrom = bitBoardToSquare(from);
   let moves: EncodedMove[] = [];
   for (let eachTo of iterBits(to)) {
@@ -50,4 +65,14 @@ export const encodeMove = (from: BitBoard, to: BitBoard): EncodedMove[] => {
     moves.push(encodedMove);
   }
   return moves;
+};
+
+export const encodedMoveToBitBoards = (
+  encodedMove: EncodedMove
+): [BitBoard, BitBoard] => {
+  const encodedFrom: Square = (encodedMove >>> 6) & BIT_MASK;
+  const encodedTo: Square = encodedMove & BIT_MASK;
+  const from = squareToBitBoard(encodedFrom);
+  const to = squareToBitBoard(encodedTo);
+  return [from, to];
 };

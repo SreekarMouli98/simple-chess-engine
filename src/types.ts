@@ -62,11 +62,11 @@ export type ResetGameResult = Result<'could_not_reset'>;
 export type UndoResult = Result<'no_history'>;
 
 export interface GameInterface {
-  // getStatus(): GameStatus;
+  getStatus(): GameStatus;
   getLegalMoves(from?: Position): Move[];
-  // makeMove(move: Move): MoveResult;
+  makeMove(move: Move): MoveResult;
   // undo(): UndoResult;
-  // getFen(): FenString;
+  getFen(): FenString;
   // loadFen(fen: FenString): LoadFenResult;
   // getBoard(): Board;
   // loadBoard(board: Board, options?: Partial<GameOptions>): LoadBoardResult;

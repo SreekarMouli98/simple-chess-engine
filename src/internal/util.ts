@@ -1,4 +1,4 @@
-import type { BitBoard } from './types';
+import type { BitBoard } from '@src/internal/types';
 
 export function* iterBits(bb: BitBoard): Generator<BitBoard> {
   while (bb !== 0n) {

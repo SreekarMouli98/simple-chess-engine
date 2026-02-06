@@ -2,8 +2,8 @@
  * Move generation for chess engine
  */
 
-import type { BitBoard } from './types';
-import type { Side } from './types';
+import type { BitBoard } from '@src/internal/types';
+import type { Side } from '@src/internal/types';
 import {
   FILE_A,
   FILE_B,
@@ -12,7 +12,7 @@ import {
   FULL_BOARD,
   RANK_2,
   RANK_7,
-} from './position';
+} from '@src/internal/position';
 
 export const getPawnMoves = (
   pawn: BitBoard,
@@ -22,24 +22,30 @@ export const getPawnMoves = (
 ): BitBoard => {
   let allowedMoves =
     turn === 'white'
-      ? (pawn << 8n) & ~(friendly & enemy) & FULL_BOARD // white pawn forward
-      : (pawn >> 8n) & ~(friendly & enemy) & FULL_BOARD; // black pawn forward
+      ? (pawn << 8n) & ~(friendly | enemy) & FULL_BOARD // white pawn forward
+      : (pawn >> 8n) & ~(friendly | enemy) & FULL_BOARD; // black pawn forward
   allowedMoves |=
     turn === 'white'
       ? (pawn & RANK_2) !== 0n
-        ? (pawn << 16n) & ~(friendly & enemy) & FULL_BOARD // white pawn double forward
+        ? (pawn << 16n) &
+          (allowedMoves << 8n) &
+          ~(friendly | enemy) &
+          FULL_BOARD // white pawn double forward
         : 0n
       : (pawn & RANK_7) !== 0n
-        ? (pawn >> 16n) & ~(friendly & enemy) & FULL_BOARD // black pawn double forward
+        ? (pawn >> 16n) &
+          (allowedMoves >> 8n) &
+          ~(friendly | enemy) &
+          FULL_BOARD // black pawn double forward
         : 0n;
   allowedMoves |=
     turn === 'white'
-      ? (pawn << 9n) & enemy & FULL_BOARD // white pawn capture forward-left
-      : (pawn >> 9n) & enemy & FULL_BOARD; // black pawn capture forward-left
+      ? (pawn << 9n) & enemy & ~FILE_H & FULL_BOARD // white pawn capture forward-left
+      : (pawn >> 9n) & enemy & ~FILE_A & FULL_BOARD; // black pawn capture forward-left
   allowedMoves |=
     turn === 'white'
-      ? (pawn << 7n) & enemy & FULL_BOARD // white pawn capture forward-right
-      : (pawn >> 7n) & enemy & FULL_BOARD; // black pawn capture forward-right
+      ? (pawn << 7n) & enemy & ~FILE_A & FULL_BOARD // white pawn capture forward-right
+      : (pawn >> 7n) & enemy & ~FILE_H & FULL_BOARD; // black pawn capture forward-right
   return allowedMoves;
 };
 

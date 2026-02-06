@@ -2,9 +2,9 @@
  * Internal types for chess engine
  */
 
-import type { Side } from '../types';
+import type { Side } from '@src/types';
 
-export { Side } from '../types';
+export { Side } from '@src/types';
 
 export type BitBoard = bigint;
 

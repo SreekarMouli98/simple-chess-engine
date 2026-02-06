@@ -4,7 +4,6 @@
  * Grid convention (bbFromGrid and the literals below): 8 lines = 8 ranks, 8 chars = a→h.
  * First line = rank 8, last line = rank 1. 1 = bit set, 0 = empty.
  *
- *      a b c d e f g h
  *  8   0 0 0 0 0 0 0 0   ← first line (rank 8, Black's back rank)
  *  7   0 0 0 0 0 0 0 0
  *  6   0 0 0 0 0 0 0 0
@@ -13,9 +12,10 @@
  *  3   0 0 0 0 0 0 0 0
  *  2   0 0 0 0 0 0 0 0
  *  1   0 0 0 0 0 0 0 0   ← last line (rank 1, White's back rank)
+ *      a b c d e f g h
  */
 
-import type { BitBoard } from './types';
+import type { BitBoard } from '@src/internal/types';
 
 export const bbFromGrid = (grid: string): BitBoard =>
   BigInt('0b' + grid.replace(/\s/g, ''));
@@ -72,7 +72,7 @@ export const WHITE_QUEEN: BitBoard = bbFromGrid(`
     00000000
     00000000
     00000000
-    00001000
+    00010000
 `);
 
 export const WHITE_KING: BitBoard = bbFromGrid(`
@@ -83,7 +83,7 @@ export const WHITE_KING: BitBoard = bbFromGrid(`
     00000000
     00000000
     00000000
-    00010000
+    00001000
 `);
 
 export const BLACK_PAWNS: BitBoard = bbFromGrid(`
@@ -131,7 +131,7 @@ export const BLACK_BISHOPS: BitBoard = bbFromGrid(`
 `);
 
 export const BLACK_QUEEN: BitBoard = bbFromGrid(`
-    00001000
+    00010000
     00000000
     00000000
     00000000
@@ -142,7 +142,7 @@ export const BLACK_QUEEN: BitBoard = bbFromGrid(`
 `);
 
 export const BLACK_KING: BitBoard = bbFromGrid(`
-    00010000
+    00001000
     00000000
     00000000
     00000000
