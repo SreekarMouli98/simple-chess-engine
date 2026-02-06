@@ -136,11 +136,3 @@ export const getKingMoves = (king: BitBoard, friendly: BitBoard): BitBoard => {
     ((king >> 9n) & ~friendly & ~FILE_A); // backward-right
   return allowedMoves;
 };
-
-export function* iterMoves(bb: BitBoard): Generator<BitBoard> {
-  while (bb !== 0n) {
-    const lsb: BitBoard = bb & -bb;
-    yield lsb;
-    bb &= ~lsb;
-  }
-}
