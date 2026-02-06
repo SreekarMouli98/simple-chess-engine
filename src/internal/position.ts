@@ -17,7 +17,7 @@
 
 import type { BitBoard } from './types';
 
-const bbFromGrid = (grid: string): BitBoard =>
+export const bbFromGrid = (grid: string): BitBoard =>
   BigInt('0b' + grid.replace(/\s/g, ''));
 
 export const WHITE_PAWNS: BitBoard = bbFromGrid(`
@@ -249,4 +249,26 @@ export const FILE_H: BitBoard = bbFromGrid(`
     00000001
     00000001
     00000001
+`);
+
+export const RANK_2: BitBoard = bbFromGrid(`
+    00000000
+    00000000
+    00000000
+    00000000
+    00000000
+    00000000
+    11111111
+    00000000
+`);
+
+export const RANK_7: BitBoard = bbFromGrid(`
+    00000000
+    11111111
+    00000000
+    00000000
+    00000000
+    00000000
+    00000000
+    00000000
 `);

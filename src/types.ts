@@ -63,7 +63,7 @@ export type UndoResult = Result<'no_history'>;
 
 export interface GameInterface {
   // getStatus(): GameStatus;
-  // getLegalMoves(from?: Position): Move[];
+  getLegalMoves(from?: Position): Move[];
   // makeMove(move: Move): MoveResult;
   // undo(): UndoResult;
   // getFen(): FenString;

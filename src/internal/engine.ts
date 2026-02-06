@@ -2,8 +2,7 @@
  * Core logic for chess engine
  */
 
-import type { InternalState, BitBoard } from './types';
-
+import type { InternalState, BitBoard, EncodedMove, Square } from './types';
 import {
   WHITE_PAWNS,
   WHITE_ROOKS,
@@ -18,6 +17,16 @@ import {
   BLACK_QUEEN,
   BLACK_KING,
 } from './position';
+import {
+  getPawnMoves,
+  getRookMoves,
+  getKnightMoves,
+  getBishopMoves,
+  getQueenMoves,
+  getKingMoves,
+} from './movegen';
+import { encodeMove } from './codec';
+import { iterBits } from './util';
 
 export class Engine {
   private state: InternalState;
@@ -29,20 +38,6 @@ export class Engine {
   get initialState(): InternalState {
     return {
       turn: 'white',
-      castlingRights: {
-        whiteKingSide: true,
-        whiteQueenSide: true,
-        blackKingSide: true,
-        blackQueenSide: true,
-      },
-      enPassantTarget: null,
-      halfMoveClock: 0,
-      fullMoveNumber: 0,
-      state: 'in_progress',
-      drawReason: undefined,
-      isGameOver: false,
-      canClaimDrawByRepetition: false,
-      canClaimDrawBy50Move: false,
       whitePawns: WHITE_PAWNS,
       whiteRooks: WHITE_ROOKS,
       whiteKnights: WHITE_KNIGHTS,
@@ -55,6 +50,10 @@ export class Engine {
       blackBishops: BLACK_BISHOPS,
       blackQueens: BLACK_QUEEN,
       blackKing: BLACK_KING,
+      castlingRights: 0b1111,
+      enPassantTarget: null,
+      halfMoveClock: 0,
+      fullMoveNumber: 1,
     };
   }
 
@@ -78,5 +77,60 @@ export class Engine {
       this.state.blackQueens |
       this.state.blackKing
     );
+  }
+
+  getLegalMoves(from?: Square): EncodedMove[] {
+    let pawnBb: BitBoard =
+      this.state.turn === 'white'
+        ? this.state.whitePawns
+        : this.state.blackPawns;
+    let rookBb: BitBoard =
+      this.state.turn === 'white'
+        ? this.state.whiteRooks
+        : this.state.blackRooks;
+    let knightBb: BitBoard =
+      this.state.turn === 'white'
+        ? this.state.whiteKnights
+        : this.state.blackKnights;
+    let bishopBb: BitBoard =
+      this.state.turn === 'white'
+        ? this.state.whiteBishops
+        : this.state.blackBishops;
+    let queenBb: BitBoard =
+      this.state.turn === 'white'
+        ? this.state.whiteQueens
+        : this.state.blackQueens;
+    let kingBb: BitBoard =
+      this.state.turn === 'white' ? this.state.whiteKing : this.state.blackKing;
+    let friendlyBb: BitBoard =
+      this.state.turn === 'white' ? this.allWhitePieces : this.allBlackPieces;
+    let enemyBb: BitBoard =
+      this.state.turn === 'white' ? this.allBlackPieces : this.allWhitePieces;
+    let moves: EncodedMove[] = [];
+    for (const from of iterBits(pawnBb)) {
+      const to = getPawnMoves(from, this.state.turn, friendlyBb, enemyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    for (const from of iterBits(rookBb)) {
+      const to = getRookMoves(from, friendlyBb, enemyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    for (const from of iterBits(knightBb)) {
+      const to = getKnightMoves(from, friendlyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    for (const from of iterBits(bishopBb)) {
+      const to = getBishopMoves(from, friendlyBb, enemyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    for (const from of iterBits(queenBb)) {
+      const to = getQueenMoves(from, friendlyBb, enemyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    for (const from of iterBits(kingBb)) {
+      const to = getKingMoves(from, friendlyBb);
+      moves.push(...encodeMove(from, to));
+    }
+    return moves;
   }
 }
