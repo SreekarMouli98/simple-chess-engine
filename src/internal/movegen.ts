@@ -2,7 +2,7 @@
  * Move generation for chess engine
  */
 
-import type { BitBoard } from '@src/internal/types';
+import type { BitBoard, InternalCastlingRights } from '@src/internal/types';
 import type { Side } from '@src/internal/types';
 import {
   FILE_A,
@@ -130,7 +130,12 @@ export const getQueenMoves = (
   return allowedMoves;
 };
 
-export const getKingMoves = (king: BitBoard, friendly: BitBoard): BitBoard => {
+export const getKingMoves = (
+  king: BitBoard,
+  side: Side,
+  friendly: BitBoard,
+  castlingRights: InternalCastlingRights
+): BitBoard => {
   const allowedMoves =
     ((king << 9n) & ~friendly & ~FILE_H & FULL_BOARD) | // forward-left
     ((king << 8n) & ~friendly & FULL_BOARD) | // forward
@@ -140,5 +145,20 @@ export const getKingMoves = (king: BitBoard, friendly: BitBoard): BitBoard => {
     ((king >> 7n) & ~friendly & ~FILE_H) | // backward-left
     ((king >> 8n) & ~friendly) | // backward
     ((king >> 9n) & ~friendly & ~FILE_A); // backward-right
+  if (side === 'white') {
+    if ((castlingRights & 0b1000) !== 0) {
+      // king side castling
+    }
+    if ((castlingRights & 0b0100) !== 0) {
+      // queen side castling
+    }
+  } else {
+    if ((castlingRights & 0b0010) !== 0) {
+      // king side castling
+    }
+    if ((castlingRights & 0b0001) !== 0) {
+      // queen side castling
+    }
+  }
   return allowedMoves;
 };

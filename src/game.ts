@@ -18,25 +18,29 @@ import {
   decodeMove,
   encodeMove,
   squareToPosition,
+  bitBoardToSquare,
 } from '@src/internal/codec';
 
 export default class Game implements GameInterface {
-  private engine: Engine = new Engine();
+  #engine: Engine = new Engine();
 
   getStatus(): GameStatus {
     return {
-      turn: this.engine.state.turn,
+      turn: this.#engine.state.turn,
       castlingRights: {
-        whiteKingSide: !!(this.engine.state.castlingRights & 0b0001),
-        whiteQueenSide: !!(this.engine.state.castlingRights & 0b0010),
-        blackKingSide: !!(this.engine.state.castlingRights & 0b0100),
-        blackQueenSide: !!(this.engine.state.castlingRights & 0b1000),
+        whiteKingSide: !!(this.#engine.state.castlingRights & 0b0001),
+        whiteQueenSide: !!(this.#engine.state.castlingRights & 0b0010),
+        blackKingSide: !!(this.#engine.state.castlingRights & 0b0100),
+        blackQueenSide: !!(this.#engine.state.castlingRights & 0b1000),
       },
-      enPassantTarget: this.engine.state.enPassantTarget
-        ? squareToPosition(this.engine.state.enPassantTarget)
-        : null,
-      halfMoveClock: this.engine.state.halfMoveClock,
-      fullMoveNumber: this.engine.state.fullMoveNumber,
+      enPassantTarget:
+        this.#engine.state.enPassantTarget !== undefined
+          ? squareToPosition(
+              bitBoardToSquare(this.#engine.state.enPassantTarget)
+            )
+          : undefined,
+      halfMoveClock: this.#engine.state.halfMoveClock,
+      fullMoveNumber: this.#engine.state.fullMoveNumber,
       state: 'in_progress',
       drawReason: undefined,
       isGameOver: false,
@@ -47,32 +51,52 @@ export default class Game implements GameInterface {
 
   getLegalMoves(from?: Position): Move[] {
     const encodedFrom = from ? positionToSquare(from) : undefined;
-    const encodedMoves = this.engine.getLegalMoves(encodedFrom);
+    const encodedMoves = this.#engine.getLegalMoves(encodedFrom);
     return encodedMoves.map((encodedMove) => decodeMove(encodedMove));
   }
 
   makeMove(move: Move): MoveResult {
     try {
       const encodedMove = encodeMove(move);
-      const success = this.engine.makeMove(encodedMove);
+      this.#engine.makeMove(encodedMove);
       return {
-        success,
+        success: true,
         status: this.getStatus(),
       } as MoveResult;
-    } catch (error) {
+    } catch (err) {
       return {
         success: false,
         status: this.getStatus(),
-        error: { code: 'invalid_move' },
+        error: {
+          code: 'invalid_move',
+          message: err instanceof Error ? err.message : undefined,
+        },
       };
     }
   }
 
   getFen(): FenString {
-    return this.engine.getFen();
+    return this.#engine.getFen();
   }
 
-  // undo(): UndoResult { }
+  undo(): UndoResult {
+    try {
+      this.#engine.undo();
+      return {
+        success: true,
+        status: this.getStatus(),
+      };
+    } catch (err) {
+      return {
+        success: false,
+        status: this.getStatus(),
+        error: {
+          code: 'no_history',
+          message: err instanceof Error ? err.message : undefined,
+        },
+      };
+    }
+  }
 
   // getFen(): FenString { }
 

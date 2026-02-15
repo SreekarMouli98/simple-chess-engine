@@ -18,7 +18,7 @@ export type CastlingRights = {
 export type GameOptions = {
   turn: Side;
   castlingRights: CastlingRights;
-  enPassantTarget: Position | null;
+  enPassantTarget: Position | undefined;
   halfMoveClock: number;
   fullMoveNumber: number;
 };
@@ -65,7 +65,7 @@ export interface GameInterface {
   getStatus(): GameStatus;
   getLegalMoves(from?: Position): Move[];
   makeMove(move: Move): MoveResult;
-  // undo(): UndoResult;
+  undo(): UndoResult;
   getFen(): FenString;
   // loadFen(fen: FenString): LoadFenResult;
   // getBoard(): Board;

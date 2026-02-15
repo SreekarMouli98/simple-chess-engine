@@ -17,8 +17,14 @@ export const squareToPosition = (index: Square): Position => {
   return position;
 };
 
+export const getEncodedFromViaEncodedMove = (
+  encodedMove: EncodedMove
+): Square => {
+  return (encodedMove >>> 6) & BIT_MASK;
+};
+
 export const decodeMove = (encodedMove: EncodedMove): Move => {
-  const encodedFrom: Square = (encodedMove >>> 6) & BIT_MASK;
+  const encodedFrom: Square = getEncodedFromViaEncodedMove(encodedMove);
   const encodedTo: Square = encodedMove & BIT_MASK;
   const from: Position = squareToPosition(encodedFrom);
   const to: Position = squareToPosition(encodedTo);
@@ -70,7 +76,7 @@ export const bitBoardsToEncodedMove = (
 export const encodedMoveToBitBoards = (
   encodedMove: EncodedMove
 ): [BitBoard, BitBoard] => {
-  const encodedFrom: Square = (encodedMove >>> 6) & BIT_MASK;
+  const encodedFrom: Square = getEncodedFromViaEncodedMove(encodedMove);
   const encodedTo: Square = encodedMove & BIT_MASK;
   const from = squareToBitBoard(encodedFrom);
   const to = squareToBitBoard(encodedTo);
