@@ -3,14 +3,26 @@
   "version": "3.1.0",
   "description": "A Multiplayer chess engine",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "jest",
+    "bench": "node bench/benchmark.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build": "tsc"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Mouli2105/simple-chess-engine.git"
   },
   "author": "",
   "license": "ISC",
+  "packageManager": "pnpm@10.28.0",
   "dependencies": {
     "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.9.3"
   }
 }

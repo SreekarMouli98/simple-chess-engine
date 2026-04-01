@@ -1,0 +1,138 @@
+/**
+ * Internal types for chess engine
+ */
+
+import type { Side, Piece } from '@src/types';
+
+export { Side, Piece } from '@src/types';
+
+export type BitBoard = bigint;
+
+/**
+ * 4-bit number
+ * - bit 0: white king side
+ * - bit 1: white queen side
+ * - bit 2: black king side
+ * - bit 3: black queen side
+ */
+export type InternalCastlingRights = number;
+
+/**
+ * 6-bit number: 0-63
+ *
+ * -       a  b  c  d  e  f  g  h
+ * -  8   56 57 58 59 60 61 62 63   ← first line (rank 8, Black's back rank)
+ * -  7   48 49 50 51 52 53 54 55
+ * -  6   40 41 43 44 45 46 47 48
+ * -  5   32 33 34 35 36 37 38 39
+ * -  4   24 25 26 27 28 29 30 31
+ * -  3   16 17 18 19 20 21 22 23
+ * -  2   08 09 10 11 12 13 14 15
+ * -  1   00 01 02 03 04 05 06 07   ← last line (rank 1, White's back rank)
+ *
+ */
+export type Square = number;
+
+/**
+ * Packed move layout. 12-bit number.
+ * - bits 0..5   : to square   (@type Square)
+ * - bits 6..11  : from square (@type Square)
+ */
+export type EncodedMove = number;
+
+/**
+ * 2-bit number
+ * - 00: knight
+ * - 01: bishop
+ * - 10: rook
+ * - 11: queen
+ */
+export type EncodedPromotionPiece = number;
+
+/**
+ * 3-bit number
+ * - 000: no capture
+ * - 001: pawn
+ * - 010: rook
+ * - 011: knight
+ * - 100: bishop
+ * - 101: queen
+ * - 110: king
+ */
+export type EncodedCapturePiece = number;
+
+/**
+ * 1-bit number
+ * - 0: false
+ * - 1: true
+ */
+export type EncodedIsEnPassantCapture = number;
+
+/**
+ * 8-bit number 0-255 (valid values are 1-150)
+ */
+export type HalfMoveClock = number;
+
+/**
+ * 1-bit number
+ * - 0: false
+ * - 1: true
+ */
+export type EncodedHasEnPassantTarget = number;
+
+/**
+ * Packed move layout. 37-bit number.
+ * - 6 bits 00..05  : to square   (@type Square)
+ * - 6 bits 06..11  : from square (@type Square)
+ * - 2 bits 12..13  : promotion piece (@type EncodedPromotionPiece)
+ * - 3 bits 14..16  : capture piece (@type EncodedCapturePiece)
+ * - 1 bit  17      : is en passant capture (@type EncodedIsEnPassantCapture)
+ * - 4 bits 18..21  : previous castling rights (@type InternalCastlingRights)
+ * - 1 bit  22      : has en passant target (@type EncodedHasEnPassantTarget)
+ * - 6 bits 23..28  : previous en passant target (@type Square)
+ * - 8 bits 29..36  : previous half move clock (@type HalfMoveClock)
+ */
+export type FullEncodedMove = bigint;
+
+export interface InternalState {
+  turn: Side;
+  whitePawns: BitBoard;
+  whiteRooks: BitBoard;
+  whiteKnights: BitBoard;
+  whiteBishops: BitBoard;
+  whiteQueens: BitBoard;
+  whiteKing: BitBoard;
+  blackPawns: BitBoard;
+  blackRooks: BitBoard;
+  blackKnights: BitBoard;
+  blackBishops: BitBoard;
+  blackQueens: BitBoard;
+  blackKing: BitBoard;
+  castlingRights: InternalCastlingRights;
+  enPassantTarget: BitBoard | undefined;
+  halfMoveClock: HalfMoveClock;
+  fullMoveNumber: number;
+}
+
+export interface TurnMetadata {
+  friendlyBb: BitBoard;
+  enemyBb: BitBoard;
+  friendlyPawns: BitBoard;
+  friendlyRooks: BitBoard;
+  friendlyKnights: BitBoard;
+  friendlyBishops: BitBoard;
+  friendlyQueens: BitBoard;
+  friendlyKing: BitBoard;
+  enemyPawns: BitBoard;
+  enemyRooks: BitBoard;
+  enemyKnights: BitBoard;
+  enemyBishops: BitBoard;
+  enemyQueens: BitBoard;
+  enemyKing: BitBoard;
+}
+
+export interface MoveMetadata {
+  isCapture: boolean;
+  capturePiece: Piece;
+  capturePieceBb: BitBoard;
+}
